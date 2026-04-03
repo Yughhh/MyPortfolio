@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rock Paper Scissors</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0f;
+        --surface: #13131a;
+        --card: #1a1a26;
+        --accent: #e8ff47;
+        --accent2: #ff4778;
+        --accent3: #47c8ff;
+        --text: #f0f0f0;
+        --muted: #666;
+        --win: #47ff8a;
+        --lose: #ff4747;
+        --draw: #ffaa47;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-x: hidden;
+      }
+
+      /* Background grid */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(232, 255, 71, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(232, 255, 71, 0.03) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Glow orbs */
+      body::after {
+        content: "";
+        position: fixed;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(232, 255, 71, 0.04) 0%,
+          transparent 70%
+        );
+        top: -200px;
+        left: -200px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .wrapper {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 900px;
+        padding: 40px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 48px;
+      }
+
+      /* HEADER */
+      header {
+        text-align: center;
+      }
+
+      .title-tag {
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: rgba(232, 255, 71, 0.08);
+        border: 1px solid rgba(232, 255, 71, 0.2);
+        padding: 6px 16px;
+        border-radius: 100px;
+        display: inline-block;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(3.5rem, 10vw, 7rem);
+        letter-spacing: 0.04em;
+        line-height: 0.9;
+        background: linear-gradient(135deg, #fff 30%, rgba(255, 255, 255, 0.4));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      h1 span {
+        background: linear-gradient(135deg, var(--accent), #b8ff00);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* SCOREBOARD */
+      .scoreboard {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        background: var(--surface);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        padding: 6px;
+        overflow: hidden;
+      }
+
+      .score-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 48px;
+        gap: 4px;
+        position: relative;
+      }
+
+      .score-block.you {
+        border-radius: 14px 0 0 14px;
+      }
+      .score-block.comp {
+        border-radius: 0 14px 14px 0;
+      }
+
+      .score-label {
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .score-num {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 4rem;
+        line-height: 1;
+        transition:
+          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          color 0.3s;
+      }
+
+      .score-num.bump {
+        animation: scoreBump 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      @keyframes scoreBump {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.4);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .score-divider {
+        width: 1px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .vs-badge {
+        padding: 0 20px;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.2rem;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+      }
+
+      /* ARENA / BATTLE DISPLAY */
+      .arena {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 24px;
+        padding: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        min-height: 160px;
+      }
+
+      .arena-side {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+      }
+
+      .arena-label {
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .arena-icon {
+        font-size: 3.5rem;
+        line-height: 1;
+        opacity: 0.2;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        filter: grayscale(1);
+      }
+
+      .arena-icon.revealed {
+        opacity: 1;
+        filter: grayscale(0);
+        animation: revealPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      @keyframes revealPop {
+        0% {
+          transform: scale(0) rotate(-20deg);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+        }
+      }
+
+      .arena-vs {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.12);
+        padding: 0 12px;
+      }
+
+      /* RESULT MESSAGE */
+      .result-bar {
+        width: 100%;
+        border-radius: 16px;
+        padding: 18px 28px;
+        text-align: center;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.6rem;
+        letter-spacing: 0.06em;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+        transition: all 0.4s ease;
+      }
+
+      .result-bar.win {
+        background: rgba(71, 255, 138, 0.08);
+        border-color: rgba(71, 255, 138, 0.3);
+        color: var(--win);
+      }
+
+      .result-bar.lose {
+        background: rgba(255, 71, 71, 0.08);
+        border-color: rgba(255, 71, 71, 0.3);
+        color: var(--lose);
+      }
+
+      .result-bar.draw {
+        background: rgba(255, 170, 71, 0.08);
+        border-color: rgba(255, 170, 71, 0.3);
+        color: var(--draw);
+      }
+
+      /* CHOICES */
+      .choices-section {
+        width: 100%;
+      }
+
+      .choices-hint {
+        text-align: center;
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 20px;
+      }
+
+      .choices {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .choice {
+        background: var(--card);
+        border: 2px solid rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        padding: 28px 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        user-select: none;
+      }
+
+      .choice::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.2s;
+        border-radius: 18px;
+      }
+
+      #stone::before {
+        background: radial-gradient(
+          circle at 50% 0%,
+          rgba(71, 200, 255, 0.12),
+          transparent 70%
+        );
+      }
+      #paper::before {
+        background: radial-gradient(
+          circle at 50% 0%,
+          rgba(232, 255, 71, 0.12),
+          transparent 70%
+        );
+      }
+      #scissor::before {
+        background: radial-gradient(
+          circle at 50% 0%,
+          rgba(255, 71, 120, 0.12),
+          transparent 70%
+        );
+      }
+
+      .choice:hover::before {
+        opacity: 1;
+      }
+
+      .choice:hover {
+        border-color: rgba(255, 255, 255, 0.18);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .choice:active {
+        transform: translateY(-1px) scale(0.98);
+      }
+
+      #stone:hover {
+        border-color: rgba(71, 200, 255, 0.4);
+      }
+      #paper:hover {
+        border-color: rgba(232, 255, 71, 0.4);
+      }
+      #scissor:hover {
+        border-color: rgba(255, 71, 120, 0.4);
+      }
+
+      .choice.selected {
+        animation: choicePulse 0.4s ease;
+      }
+
+      @keyframes choicePulse {
+        0% {
+          transform: scale(1);
+        }
+        40% {
+          transform: scale(0.95);
+        }
+        70% {
+          transform: scale(1.04);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .choice-emoji {
+        font-size: 3rem;
+        line-height: 1;
+      }
+
+      .choice-name {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.1rem;
+        letter-spacing: 0.12em;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        transition: color 0.2s;
+      }
+
+      #stone:hover .choice-name {
+        color: var(--accent3);
+      }
+      #paper:hover .choice-name {
+        color: var(--accent);
+      }
+      #scissor:hover .choice-name {
+        color: var(--accent2);
+      }
+
+      .choice-key {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        font-size: 0.65rem;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+        font-weight: 500;
+      }
+
+      /* RESET BUTTON */
+      .reset-btn {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--muted);
+        padding: 12px 32px;
+        border-radius: 100px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .reset-btn:hover {
+        border-color: rgba(255, 255, 255, 0.3);
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      /* STREAK */
+      .streak-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78rem;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+      }
+
+      .streak-dots {
+        display: flex;
+        gap: 5px;
+      }
+
+      .streak-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .streak-dot.w {
+        background: var(--win);
+        box-shadow: 0 0 6px rgba(71, 255, 138, 0.5);
+      }
+      .streak-dot.l {
+        background: var(--lose);
+        box-shadow: 0 0 6px rgba(255, 71, 71, 0.5);
+      }
+      .streak-dot.d {
+        background: var(--draw);
+        box-shadow: 0 0 6px rgba(255, 170, 71, 0.5);
+      }
+
+      /* Rounds */
+      .round-counter {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <div class="title-tag">Classic Game</div>
+        <h1>Rock<br /><span>Paper</span><br />Scissors</h1>
+      </header>
+
+      <!-- Scoreboard -->
+      <div class="scoreboard">
+        <div class="score-block you">
+          <div class="score-label">You</div>
+          <div class="score-num" id="user-score">0</div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="score-block comp">
+          <div class="score-label">Comp</div>
+          <div class="score-num" id="comp-score">0</div>
+        </div>
+      </div>
+
+      <!-- Round & Streak -->
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+        "
+      >
+        <div class="round-counter">Round <span id="round-num">1</span></div>
+        <div class="streak-bar">
+          Last 5:
+          <div class="streak-dots" id="streak-dots">
+            <div class="streak-dot"></div>
+            <div class="streak-dot"></div>
+            <div class="streak-dot"></div>
+            <div class="streak-dot"></div>
+            <div class="streak-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arena -->
+      <div class="arena">
+        <div class="arena-side">
+          <div class="arena-label">Your Pick</div>
+          <div class="arena-icon" id="user-icon">🪨</div>
+        </div>
+        <div class="arena-vs">VS</div>
+        <div class="arena-side">
+          <div class="arena-label">Computer</div>
+          <div class="arena-icon" id="comp-icon">✂️</div>
+        </div>
+      </div>
+
+      <!-- Result Message -->
+      <div class="result-bar" id="result-bar">Pick a move to begin</div>
+
+      <!-- Choices -->
+      <div class="choices-section">
+        <div class="choices-hint">Choose your weapon</div>
+        <div class="choices">
+          <div class="choice" id="stone">
+            <span class="choice-key">[ R ]</span>
+            <div class="choice-emoji">🪨</div>
+            <div class="choice-name">Rock</div>
+          </div>
+          <div class="choice" id="paper">
+            <span class="choice-key">[ P ]</span>
+            <div class="choice-emoji">📄</div>
+            <div class="choice-name">Paper</div>
+          </div>
+          <div class="choice" id="scissor">
+            <span class="choice-key">[ S ]</span>
+            <div class="choice-emoji">✂️</div>
+            <div class="choice-name">Scissors</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="reset-btn" id="reset-btn">↺ Reset Score</button>
+    </div>
+
+    <script>
+      const EMOJIS = { stone: "🪨", paper: "📄", scissor: "✂️" };
+      const NAMES = { stone: "Rock", paper: "Paper", scissor: "Scissors" };
+      const OPTIONS = ["stone", "paper", "scissor"];
+
+      let userScore = 0,
+        compScore = 0,
+        roundNum = 1;
+      let streak = [];
+
+      const userScoreEl = document.getElementById("user-score");
+      const compScoreEl = document.getElementById("comp-score");
+      const resultBar = document.getElementById("result-bar");
+      const userIcon = document.getElementById("user-icon");
+      const compIcon = document.getElementById("comp-icon");
+      const roundNumEl = document.getElementById("round-num");
+      const streakDots = document.querySelectorAll(".streak-dot");
+
+      const genCompChoice = () => OPTIONS[Math.floor(Math.random() * 3)];
+
+      const setArena = (uChoice, cChoice, animate = true) => {
+        userIcon.textContent = EMOJIS[uChoice];
+        compIcon.textContent = EMOJIS[cChoice];
+        if (animate) {
+          userIcon.classList.remove("revealed");
+          compIcon.classList.remove("revealed");
+          requestAnimationFrame(() => {
+            userIcon.classList.add("revealed");
+            setTimeout(() => compIcon.classList.add("revealed"), 120);
+          });
+        }
+      };
+
+      const bumpScore = (el) => {
+        el.classList.remove("bump");
+        void el.offsetWidth;
+        el.classList.add("bump");
+      };
+
+      const updateStreak = (result) => {
+        streak.push(result);
+        if (streak.length > 5) streak.shift();
+        streakDots.forEach((dot, i) => {
+          dot.className = "streak-dot";
+          if (i < streak.length) dot.classList.add(streak[i]);
+        });
+      };
+
+      const playGame = (userChoice) => {
+        const compChoice = genCompChoice();
+
+        // Animate choice card
+        const choiceEl = document.getElementById(userChoice);
+        choiceEl.classList.remove("selected");
+        void choiceEl.offsetWidth;
+        choiceEl.classList.add("selected");
+
+        setArena(userChoice, compChoice);
+
+        let outcome;
+        if (userChoice === compChoice) {
+          outcome = "draw";
+          resultBar.className = "result-bar draw";
+          resultBar.textContent = `Draw! You both chose ${NAMES[userChoice]}`;
+        } else {
+          let userWin = false;
+          if (userChoice === "stone") userWin = compChoice !== "paper";
+          else if (userChoice === "paper") userWin = compChoice !== "scissor";
+          else userWin = compChoice !== "stone";
+
+          if (userWin) {
+            outcome = "w";
+            userScore++;
+            userScoreEl.textContent = userScore;
+            bumpScore(userScoreEl);
+            resultBar.className = "result-bar win";
+            resultBar.textContent = `You win! ${NAMES[userChoice]} beats ${NAMES[compChoice]}`;
+          } else {
+            outcome = "l";
+            compScore++;
+            compScoreEl.textContent = compScore;
+            bumpScore(compScoreEl);
+            resultBar.className = "result-bar lose";
+            resultBar.textContent = `You lose! ${NAMES[compChoice]} beats ${NAMES[userChoice]}`;
+          }
+        }
+
+        updateStreak(outcome);
+        roundNumEl.textContent = ++roundNum;
+      };
+
+      // Clicks
+      document.querySelectorAll(".choice").forEach((el) => {
+        el.addEventListener("click", () => playGame(el.id));
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        const k = e.key.toLowerCase();
+        if (k === "r") playGame("stone");
+        else if (k === "p") playGame("paper");
+        else if (k === "s") playGame("scissor");
+      });
+
+      // Reset
+      document.getElementById("reset-btn").addEventListener("click", () => {
+        userScore = 0;
+        compScore = 0;
+        roundNum = 1;
+        streak = [];
+        userScoreEl.textContent = "0";
+        compScoreEl.textContent = "0";
+        roundNumEl.textContent = "1";
+        resultBar.className = "result-bar";
+        resultBar.textContent = "Pick a move to begin";
+        userIcon.textContent = "🪨";
+        compIcon.textContent = "✂️";
+        userIcon.classList.remove("revealed");
+        compIcon.classList.remove("revealed");
+        streakDots.forEach((d) => (d.className = "streak-dot"));
+      });
+    </script>
+  </body>
+</html>

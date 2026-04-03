@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Converter</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0a0a0f;
+        --surface: #13131c;
+        --surface2: #1c1c2a;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-bright: rgba(255, 255, 255, 0.18);
+        --accent: #c8f060;
+        --accent-dim: rgba(200, 240, 96, 0.12);
+        --accent-glow: rgba(200, 240, 96, 0.25);
+        --text: #f0f0f0;
+        --text-muted: #6b6b80;
+        --text-dim: #9898a8;
+        --red: #ff5c5c;
+        --mono: "DM Mono", monospace;
+        --display: "Syne", sans-serif;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--display);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: -30%;
+        left: -20%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(
+          ellipse,
+          rgba(200, 240, 96, 0.04) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 480px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent),
+          transparent
+        );
+        opacity: 0.5;
+      }
+
+      .header {
+        margin-bottom: 2rem;
+      }
+
+      .header-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--accent);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        line-height: 1.1;
+      }
+
+      .field-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      .amount-section {
+        margin-bottom: 1.75rem;
+      }
+
+      .amount-input-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .amount-input-wrap .currency-symbol {
+        position: absolute;
+        left: 16px;
+        font-family: var(--mono);
+        font-size: 18px;
+        color: var(--text-muted);
+        pointer-events: none;
+      }
+
+      #amountInput {
+        width: 100%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 22px;
+        font-weight: 500;
+        padding: 14px 16px 14px 36px;
+        outline: none;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      #amountInput:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-dim);
+      }
+
+      #amountInput::placeholder {
+        color: var(--text-muted);
+      }
+
+      .pair-section {
+        display: grid;
+        grid-template-columns: 1fr 44px 1fr;
+        align-items: end;
+        gap: 10px;
+        margin-bottom: 1.75rem;
+      }
+
+      .currency-select-wrap {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .flag-select {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        position: relative;
+      }
+
+      .flag-select:hover {
+        border-color: var(--border-bright);
+      }
+
+      .flag-select img {
+        width: 28px;
+        height: 20px;
+        object-fit: cover;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+
+      .flag-select select {
+        appearance: none;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 15px;
+        font-weight: 500;
+        outline: none;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      .flag-select select option {
+        background: #1c1c2a;
+      }
+
+      .swap-btn {
+        width: 44px;
+        height: 44px;
+        background: var(--accent-dim);
+        border: 1px solid rgba(200, 240, 96, 0.25);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.3s;
+        align-self: center;
+        margin-top: 22px;
+        flex-shrink: 0;
+      }
+
+      .swap-btn:hover {
+        background: rgba(200, 240, 96, 0.22);
+      }
+      .swap-btn.spinning {
+        transform: rotate(180deg);
+      }
+
+      .swap-btn svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--accent);
+      }
+
+      .rate-display {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 1.75rem;
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: border-color 0.3s;
+      }
+
+      .rate-display.success {
+        border-color: rgba(200, 240, 96, 0.3);
+      }
+      .rate-display.error {
+        border-color: rgba(255, 92, 92, 0.3);
+      }
+      .rate-display.loading {
+        border-color: var(--border);
+      }
+
+      .rate-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--text-muted);
+        flex-shrink: 0;
+        transition: background 0.3s;
+      }
+
+      .rate-display.success .rate-indicator {
+        background: var(--accent);
+        animation: pulse 2s infinite;
+      }
+      .rate-display.error .rate-indicator {
+        background: var(--red);
+      }
+      .rate-display.loading .rate-indicator {
+        background: #5577ff;
+        animation: pulse 0.8s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .rate-text {
+        font-family: var(--mono);
+        font-size: 14px;
+        color: var(--text-dim);
+        line-height: 1.5;
+      }
+
+      .rate-text .result-main {
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--text);
+        display: block;
+      }
+
+      .rate-text .result-rate {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .rate-text .error-msg {
+        color: var(--red);
+        font-size: 13px;
+      }
+
+      .convert-btn {
+        width: 100%;
+        padding: 16px;
+        background: var(--accent);
+        color: #0a0a0f;
+        border: none;
+        border-radius: 12px;
+        font-family: var(--display);
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        transition:
+          transform 0.15s,
+          box-shadow 0.2s,
+          background 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .convert-btn:hover {
+        box-shadow: 0 0 28px var(--accent-glow);
+        transform: translateY(-1px);
+      }
+
+      .convert-btn:active {
+        transform: translateY(0);
+      }
+
+      .convert-btn.loading-btn {
+        pointer-events: none;
+        background: rgba(200, 240, 96, 0.5);
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        border-top-color: #0a0a0f;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        vertical-align: middle;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .footer-note {
+        text-align: center;
+        margin-top: 1.25rem;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .footer-note span {
+        color: var(--accent);
+      }
+
+      @media (max-width: 420px) {
+        .card {
+          padding: 1.5rem;
+        }
+        .header h1 {
+          font-size: 22px;
+        }
+        .pair-section {
+          grid-template-columns: 1fr 38px 1fr;
+          gap: 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="header">
+        <div class="header-label">Live rates</div>
+        <h1>Currency<br />Converter</h1>
+      </div>
+
+      <div class="amount-section">
+        <div class="field-label">Amount</div>
+        <div class="amount-input-wrap">
+          <span class="currency-symbol" id="symbolDisplay">$</span>
+          <input
+            id="amountInput"
+            type="number"
+            placeholder="100"
+            value="1"
+            min="0"
+            step="any"
+          />
+        </div>
+      </div>
+
+      <div class="pair-section">
+        <div class="currency-select-wrap">
+          <div class="field-label">From</div>
+          <div class="flag-select">
+            <img id="flagFrom" src="" alt="" />
+            <select id="currencyFrom"></select>
+          </div>
+        </div>
+
+        <button class="swap-btn" id="swapBtn" title="Swap currencies">
+          <svg
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+          </svg>
+        </button>
+
+        <div class="currency-select-wrap">
+          <div class="field-label">To</div>
+          <div class="flag-select">
+            <img id="flagTo" src="" alt="" />
+            <select id="currencyTo"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="rate-display" id="rateDisplay">
+        <div class="rate-indicator"></div>
+        <div class="rate-text" id="rateText">
+          Enter an amount and click Convert
+        </div>
+      </div>
+
+      <button class="convert-btn" id="convertBtn">Convert Now</button>
+
+      <p class="footer-note">
+        Powered by <span>ExchangeRate-API</span> · Live mid-market rates
+      </p>
+    </div>
+
+    <script>
+      const CURRENCIES = [
+        { code: "USD", name: "US Dollar", flag: "US", symbol: "$" },
+        { code: "EUR", name: "Euro", flag: "EU", symbol: "€" },
+        { code: "GBP", name: "British Pound", flag: "GB", symbol: "£" },
+        { code: "INR", name: "Indian Rupee", flag: "IN", symbol: "₹" },
+        { code: "JPY", name: "Japanese Yen", flag: "JP", symbol: "¥" },
+        { code: "CAD", name: "Canadian Dollar", flag: "CA", symbol: "C$" },
+        { code: "AUD", name: "Australian Dollar", flag: "AU", symbol: "A$" },
+        { code: "CHF", name: "Swiss Franc", flag: "CH", symbol: "₣" },
+        { code: "CNY", name: "Chinese Yuan", flag: "CN", symbol: "¥" },
+        { code: "SGD", name: "Singapore Dollar", flag: "SG", symbol: "S$" },
+        { code: "NZD", name: "New Zealand Dollar", flag: "NZ", symbol: "NZ$" },
+        { code: "HKD", name: "Hong Kong Dollar", flag: "HK", symbol: "HK$" },
+        { code: "MXN", name: "Mexican Peso", flag: "MX", symbol: "$" },
+        { code: "BRL", name: "Brazilian Real", flag: "BR", symbol: "R$" },
+        { code: "ZAR", name: "South African Rand", flag: "ZA", symbol: "R" },
+        { code: "SEK", name: "Swedish Krona", flag: "SE", symbol: "kr" },
+        { code: "NOK", name: "Norwegian Krone", flag: "NO", symbol: "kr" },
+        { code: "AED", name: "UAE Dirham", flag: "AE", symbol: "د.إ" },
+        { code: "SAR", name: "Saudi Riyal", flag: "SA", symbol: "﷼" },
+        { code: "KRW", name: "South Korean Won", flag: "KR", symbol: "₩" },
+      ];
+
+      const currencyFrom = document.getElementById("currencyFrom");
+      const currencyTo = document.getElementById("currencyTo");
+      const flagFrom = document.getElementById("flagFrom");
+      const flagTo = document.getElementById("flagTo");
+      const amountInput = document.getElementById("amountInput");
+      const rateDisplay = document.getElementById("rateDisplay");
+      const rateText = document.getElementById("rateText");
+      const convertBtn = document.getElementById("convertBtn");
+      const swapBtn = document.getElementById("swapBtn");
+      const symbolDisplay = document.getElementById("symbolDisplay");
+
+      function flagUrl(iso) {
+        return `https://flagsapi.com/${iso}/flat/64.png`;
+      }
+
+      function buildSelects() {
+        CURRENCIES.forEach((c) => {
+          const opt1 = new Option(`${c.code} — ${c.name}`, c.code);
+          const opt2 = new Option(`${c.code} — ${c.name}`, c.code);
+          currencyFrom.add(opt1);
+          currencyTo.add(opt2);
+        });
+        currencyFrom.value = "USD";
+        currencyTo.value = "INR";
+        updateFlags();
+      }
+
+      function getCurrency(code) {
+        return CURRENCIES.find((c) => c.code === code) || CURRENCIES[0];
+      }
+
+      function updateFlags() {
+        const from = getCurrency(currencyFrom.value);
+        const to = getCurrency(currencyTo.value);
+        flagFrom.src = flagUrl(from.flag);
+        flagTo.src = flagUrl(to.flag);
+        symbolDisplay.textContent = from.symbol;
+      }
+
+      function setLoading(on) {
+        if (on) {
+          convertBtn.classList.add("loading-btn");
+          convertBtn.innerHTML = `<span class="spinner"></span>Converting…`;
+          rateDisplay.className = "rate-display loading";
+          rateText.innerHTML = `<span>Fetching live rate…</span>`;
+        } else {
+          convertBtn.classList.remove("loading-btn");
+          convertBtn.textContent = "Convert Now";
+        }
+      }
+
+      function setResult(amount, from, to, rate) {
+        const converted = (amount * rate).toLocaleString("en-US", {
+          maximumFractionDigits: 4,
+        });
+        const rateStr = rate.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        });
+        const fromCur = getCurrency(from);
+        const toCur = getCurrency(to);
+        rateDisplay.className = "rate-display success";
+        rateText.innerHTML = `
+    <span class="result-main">${fromCur.symbol}${parseFloat(amount).toLocaleString()} ${from} = ${toCur.symbol}${converted} ${to}</span>
+    <span class="result-rate">1 ${from} = ${rateStr} ${to}</span>
+  `;
+      }
+
+      function setError(msg) {
+        rateDisplay.className = "rate-display error";
+        rateText.innerHTML = `<span class="error-msg">${msg}</span>`;
+      }
+
+      async function convert() {
+        const amount = parseFloat(amountInput.value);
+        if (isNaN(amount) || amount <= 0) {
+          setError("Please enter a valid positive amount.");
+          return;
+        }
+
+        const from = currencyFrom.value;
+        const to = currencyTo.value;
+
+        if (from === to) {
+          setResult(amount, from, to, 1);
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          const res = await fetch(
+            `https://api.frankfurter.app/latest?from=${from}&to=${to}`,
+          );
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const rate = data.rates[to];
+          if (!rate) throw new Error("Rate not found");
+          setResult(amount, from, to, rate);
+        } catch (err) {
+          setError(
+            "Could not fetch live rate. Check your connection and try again.",
+          );
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      swapBtn.addEventListener("click", () => {
+        const tmp = currencyFrom.value;
+        currencyFrom.value = currencyTo.value;
+        currencyTo.value = tmp;
+        updateFlags();
+        swapBtn.classList.add("spinning");
+        setTimeout(() => swapBtn.classList.remove("spinning"), 300);
+      });
+
+      currencyFrom.addEventListener("change", updateFlags);
+      currencyTo.addEventListener("change", updateFlags);
+
+      convertBtn.addEventListener("click", convert);
+
+      amountInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") convert();
+      });
+
+      buildSelects();
+    </script>
+  </body>
+</html>

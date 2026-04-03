@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href = "Currency Converter.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="container">
+        <h1>Currency Converter</h1>
+        <form>
+            <div class="amount">
+                <p>Enter Amount</p>
+                <input id = "searchBar" type = "100" type = "text">
+            </div>
+            <div class="dropDown">
+                <div class="from">
+                    <img src="https://flagsapi.com/BE/flat/64.png" alt = "Flag">
+                    <p>From :</p>
+                    <select id = "currencyOne">
+                        <option value="USD">USD</option>
+                        <option value="INR">INR</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="AUD">AUD</option>
+                        <option value="CAD">CAD</option>
+                        <option value="JPY">JPY</option>
+                        <option value="CNY">CNY</option>
+                        <option value="NZD">NZD</option>
+                        <option value="CHF">CHF</option>
+                        <option value="ZAR">ZAR</option>
+                    </select>
+                </div>
+                <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                <div class="to">
+                    <img src="https://flagsapi.com/IN/flat/64.png" alt = "Flag">
+                    <p>To :</p>
+                    <select id = "currencyTwo">
+                        <option value="USD">USD</option>
+                        <option value="INR" selected>INR</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="AUD">AUD</option>
+                        <option value="CAD">CAD</option>
+                        <option value="JPY">JPY</option>
+                        <option value="CNY">CNY</option>
+                        <option value="NZD">NZD</option>
+                        <option value="CHF">CHF</option>
+                        <option value="ZAR">ZAR</option>
+                    </select>
+                </div>
+            </div>
+            <div class="msg">1 USD = 80 INR</div>
+            <button>Convert Now</button>
+        </form>
+    </div>
+    <script src="Currency Converter.js"></script>
+    <script src="codes.js"></script>
+</body>
+</html>

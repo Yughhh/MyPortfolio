@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do List — Yugh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #0a0a1a;
+      --bg2: #0f0f22;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(124,92,252,0.15);
+      --accent: #7c5cfc;
+      --accent2: #c45cfc;
+      --text: #e8e8f0;
+      --muted: #888899;
+      --success: #34d399;
+      --danger: #f87171;
+      --radius: 16px;
+      --font-display: "Syne", sans-serif;
+      --font-body: "DM Sans", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 30%, rgba(124,92,252,0.08), transparent 60%),
+                  radial-gradient(ellipse at 80% 70%, rgba(196,92,252,0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    .app { position: relative; z-index: 1; width: 100%; max-width: 520px; }
+
+    .app-header { text-align: center; margin-bottom: 32px; }
+    .app-header h1 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--text), var(--muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    .app-header p { color: var(--muted); font-size: 0.9rem; }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-chip {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .stat-chip .num {
+      display: block;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    /* Input area */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .input-row input {
+      flex: 1;
+      padding: 14px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .input-row input::placeholder { color: var(--muted); }
+    .input-row input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,92,252,0.12);
+    }
+    .input-row button {
+      padding: 14px 22px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 30px rgba(124,92,252,0.2);
+    }
+    .input-row button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 50px rgba(124,92,252,0.35);
+    }
+
+    /* Filter tabs */
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 4px;
+      border: 1px solid var(--border);
+    }
+    .filter-tab {
+      flex: 1;
+      padding: 8px;
+      background: none;
+      border: none;
+      border-radius: 10px;
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .filter-tab:hover { color: var(--text); }
+    .filter-tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 0 20px rgba(124,92,252,0.2);
+    }
+
+    /* Task list */
+    .task-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: all 0.3s ease;
+      animation: slideIn 0.35s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .task-item:hover { border-color: var(--accent); }
+    .task-item.completed { opacity: 0.5; }
+    .task-item.completed .task-text { text-decoration: line-through; color: var(--muted); }
+
+    .task-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.25s;
+      background: none;
+      color: transparent;
+      font-size: 0.7rem;
+    }
+    .task-check:hover { border-color: var(--accent); }
+    .task-item.completed .task-check {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 0.92rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .task-date {
+      font-size: 0.7rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .task-delete {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 4px;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
+    .task-delete:hover { color: var(--danger); }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; color: var(--border); }
+
+    /* Clear all */
+    .clear-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+    .clear-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .clear-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* Back link */
+    .back-link {
+      position: fixed; top: 20px; left: 20px;
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 0.85rem;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card);
+      backdrop-filter: blur(10px); transition: all 0.25s;
+      text-decoration: none; z-index: 10;
+    }
+    .back-link:hover { color: var(--text); border-color: var(--accent); }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Portfolio</a>
+
+  <div class="app">
+    <div class="app-header">
+      <h1><i class="fa-solid fa-list-check"></i> To-Do List</h1>
+      <p>Stay organized. Get things done.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat-chip"><span class="num" id="totalStat">0</span>Total</div>
+      <div class="stat-chip"><span class="num" id="activeStat">0</span>Active</div>
+      <div class="stat-chip"><span class="num" id="doneStat">0</span>Done</div>
+    </div>
+
+    <div class="input-row">
+      <input type="text" id="taskInput" placeholder="What needs to be done?" />
+      <button id="addBtn"><i class="fa-solid fa-plus"></i></button>
+    </div>
+
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="active">Active</button>
+      <button class="filter-tab" data-filter="completed">Completed</button>
+    </div>
+
+    <div class="task-list" id="taskList"></div>
+
+    <div class="clear-row">
+      <button class="clear-btn" id="clearDone"><i class="fa-solid fa-trash-can"></i> Clear completed</button>
+    </div>
+  </div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem("yugh_todos") || "[]");
+    let currentFilter = "all";
+
+    const taskInput = document.getElementById("taskInput");
+    const addBtn = document.getElementById("addBtn");
+    const taskList = document.getElementById("taskList");
+    const clearDone = document.getElementById("clearDone");
+    const filterTabs = document.querySelectorAll(".filter-tab");
+
+    function save() {
+      localStorage.setItem("yugh_todos", JSON.stringify(tasks));
+    }
+
+    function formatDate(ts) {
+      const d = new Date(ts);
+      return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+    }
+
+    function updateStats() {
+      const total = tasks.length;
+      const done = tasks.filter(t => t.done).length;
+      document.getElementById("totalStat").textContent = total;
+      document.getElementById("activeStat").textContent = total - done;
+      document.getElementById("doneStat").textContent = done;
+    }
+
+    function render() {
+      const filtered = tasks.filter(t => {
+        if (currentFilter === "active") return !t.done;
+        if (currentFilter === "completed") return t.done;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        taskList.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-regular fa-clipboard"></i>
+            ${currentFilter === "completed" ? "No completed tasks yet" :
+              currentFilter === "active" ? "All tasks done! 🎉" :
+              "Add your first task above"}
+          </div>`;
+      } else {
+        taskList.innerHTML = filtered.map(t => `
+          <div class="task-item ${t.done ? "completed" : ""}" data-id="${t.id}">
+            <div class="task-check" onclick="toggleTask('${t.id}')">
+              ${t.done ? '<i class="fa-solid fa-check"></i>' : ''}
+            </div>
+            <span class="task-text">${escapeHTML(t.text)}</span>
+            <span class="task-date">${formatDate(t.created)}</span>
+            <button class="task-delete" onclick="deleteTask('${t.id}')"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        `).join("");
+      }
+      updateStats();
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (!text) return;
+      tasks.unshift({ id: Date.now().toString(), text, done: false, created: Date.now() });
+      taskInput.value = "";
+      save();
+      render();
+    }
+
+    window.toggleTask = function(id) {
+      const t = tasks.find(t => t.id === id);
+      if (t) t.done = !t.done;
+      save();
+      render();
+    };
+
+    window.deleteTask = function(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      save();
+      render();
+    };
+
+    addBtn.addEventListener("click", addTask);
+    taskInput.addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
+
+    clearDone.addEventListener("click", () => {
+      tasks = tasks.filter(t => !t.done);
+      save();
+      render();
+    });
+
+    filterTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        filterTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentFilter = tab.dataset.filter;
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>

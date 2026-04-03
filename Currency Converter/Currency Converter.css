@@ -1,0 +1,86 @@
+* {
+    margin : 0;
+    padding : 0;
+}
+h1 {
+    text-align : center;
+    color : rgb(33, 33, 149);
+    font-weight : bold;
+    font-size : 40px;
+}
+.container {
+    width : 500px;
+    height : 400px;
+    background-color : lightgrey;
+    position : absolute;
+    top : 50%;
+    left : 50%;
+    transform : translate(-50%, -50%);
+    box-shadow : 0px 0px 20px 0px lightgrey;
+    border-radius : 10px;
+    padding : 20px;
+}
+.amount {
+    align-items : center;
+    text-align : center;
+    width : 100%;
+    font-size : 1.2rem;
+    font-weight : bold;
+    margin-top : 20px;
+}
+#searchBar {
+    width : 80%;
+    height : 40px;
+    border : 1px solid rgb(200, 200, 200);
+    border-radius : 5px;
+    font-size : 20px;
+    text-align : center;
+    margin-top : 10px;
+}
+.dropDown {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    margin-top : 30px;
+    font-weight : bold;
+}
+.from, .to {
+    display : flex;
+    flex-direction : column;
+    align-items : center;
+    margin : 0 20px;
+}
+#currencyOne, #currencyTwo {
+    width : 200px;
+    height : 1.2rem;
+    margin-top : 10px;
+    font-size : 1rem;
+    text-align : center;
+    border : 1px solid rgb(200, 200, 200);
+    border-radius : 5px;
+}
+.msg {
+    text-align : center;
+    margin : 20px;
+    font-size : 1.2rem;
+    font-weight : bold;
+    color : rgb(33, 33, 149);
+}
+button {
+    width : 100px;
+    height : 40px;
+    background-color : rgb(33, 33, 149);
+    color : white;
+    border : none;
+    border-radius : 5px;
+}
+button:hover {
+    /* scale : 1.1; */
+    background-color : green;
+    transition-duration : 0.3s;
+    cursor : pointer;
+    box-shadow : 0px 0px 10px 0px green;
+}
+body {
+    background-color : black;
+}

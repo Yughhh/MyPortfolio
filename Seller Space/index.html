@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller Space — Yugh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #0a0a1a;
+      --bg2: #0f0f22;
+      --bg3: #141428;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(124,92,252,0.15);
+      --accent: #7c5cfc;
+      --accent2: #c45cfc;
+      --accent3: #34d399;
+      --text: #e8e8f0;
+      --muted: #888899;
+      --radius: 16px;
+      --font-display: "Syne", sans-serif;
+      --font-body: "DM Sans", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 30% 10%, rgba(124,92,252,0.08), transparent 50%),
+                  radial-gradient(ellipse at 70% 90%, rgba(196,92,252,0.06), transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── NAV ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      background: rgba(10,10,26,0.8); border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between; height: 68px;
+    }
+    .logo {
+      font-family: var(--font-display); font-size: 1.3rem; font-weight: 800;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .logo i { color: var(--accent); }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      font-size: 0.88rem; font-weight: 500; color: var(--muted);
+      padding: 8px 16px; border-radius: 8px; transition: all 0.25s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--card); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--accent), var(--accent2)) !important;
+      color: #fff !important; border-radius: 10px !important;
+      box-shadow: 0 0 25px rgba(124,92,252,0.2);
+    }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 0 40px rgba(124,92,252,0.35); }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 160px 0 100px; text-align: center; position: relative; z-index: 1;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(124,92,252,0.1); border: 1px solid var(--border);
+      border-radius: 50px; padding: 6px 18px; font-size: 0.78rem;
+      color: var(--accent); font-weight: 600; letter-spacing: 0.5px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800; letter-spacing: -2px; line-height: 1.1;
+      background: linear-gradient(135deg, var(--text) 0%, var(--muted) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: var(--muted); font-size: 1.1rem; max-width: 560px; margin: 0 auto 40px;
+    }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 12px;
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; transition: all 0.3s; border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; box-shadow: 0 0 40px rgba(124,92,252,0.25);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(124,92,252,0.4); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { background: var(--card); border-color: var(--accent); transform: translateY(-2px); }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex; justify-content: center; gap: 48px;
+      padding: 48px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      margin-bottom: 80px; position: relative; z-index: 1;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: var(--font-display); font-size: 2.2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-family: var(--font-display); font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800; letter-spacing: -1px; text-align: center; margin-bottom: 16px;
+      position: relative; z-index: 1;
+    }
+    .section-subtitle {
+      text-align: center; color: var(--muted); font-size: 0.95rem;
+      max-width: 500px; margin: 0 auto 48px; position: relative; z-index: 1;
+    }
+
+    /* ── PRODUCTS ── */
+    .products-section { padding: 80px 0; position: relative; z-index: 1; }
+    .category-tabs {
+      display: flex; justify-content: center; gap: 8px; margin-bottom: 40px; flex-wrap: wrap;
+    }
+    .cat-tab {
+      padding: 8px 20px; border-radius: 50px; font-family: var(--font-body);
+      font-size: 0.85rem; font-weight: 500; color: var(--muted);
+      background: var(--card); border: 1px solid var(--border);
+      cursor: pointer; transition: all 0.25s;
+    }
+    .cat-tab:hover { color: var(--text); border-color: var(--accent); }
+    .cat-tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border-color: transparent; box-shadow: 0 0 25px rgba(124,92,252,0.2);
+    }
+
+    .products-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px;
+    }
+    .product-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; transition: all 0.35s; position: relative; overflow: hidden;
+    }
+    .product-card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 0 40px rgba(124,92,252,0.12); }
+    .product-img {
+      width: 100%; aspect-ratio: 1; background: var(--bg3); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px; overflow: hidden; position: relative;
+    }
+    .product-img i { font-size: 2.5rem; color: var(--accent); opacity: 0.4; }
+    .product-img .badge {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px;
+      padding: 4px 10px; border-radius: 50px;
+      background: rgba(52,211,153,0.15); color: var(--accent3);
+    }
+    .product-name {
+      font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .product-seller { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+    .product-price-row { display: flex; align-items: center; justify-content: space-between; }
+    .product-price {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+      color: var(--accent);
+    }
+    .product-rating { font-size: 0.78rem; color: #fbbf24; }
+    .product-cart-btn {
+      margin-top: 14px; width: 100%; padding: 10px; border-radius: 10px;
+      background: rgba(124,92,252,0.1); border: 1px solid var(--border);
+      color: var(--accent); font-family: var(--font-body); font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; transition: all 0.25s;
+    }
+    .product-cart-btn:hover {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border-color: transparent;
+    }
+
+    /* ── FEATURES ── */
+    .features-section {
+      background: var(--bg2); padding: 80px 0; position: relative; z-index: 1;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 36px 28px; text-align: center; transition: all 0.35s;
+    }
+    .feature-card:hover { transform: translateY(-6px); border-color: var(--accent); }
+    .feature-card i {
+      font-size: 2rem; color: var(--accent); margin-bottom: 18px; display: block;
+    }
+    .feature-card h3 {
+      font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; margin-bottom: 10px;
+    }
+    .feature-card p { color: var(--muted); font-size: 0.85rem; line-height: 1.7; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 100px 0; text-align: center; position: relative; z-index: 1;
+    }
+    .cta-box {
+      background: linear-gradient(135deg, rgba(124,92,252,0.08), rgba(196,92,252,0.05));
+      border: 1px solid var(--border); border-radius: 24px;
+      padding: 60px 40px; max-width: 700px; margin: 0 auto;
+    }
+    .cta-box h2 {
+      font-family: var(--font-display); font-size: 2rem; font-weight: 800; margin-bottom: 14px;
+    }
+    .cta-box p { color: var(--muted); margin-bottom: 28px; }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--bg2); border-top: 1px solid var(--border);
+      padding: 28px 0; text-align: center; position: relative; z-index: 1;
+    }
+    .footer p { color: var(--muted); font-size: 0.82rem; }
+    .footer a { color: var(--accent); }
+
+    /* Back link */
+    .back-link {
+      position: fixed; top: 20px; left: 20px;
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 0.85rem;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1px solid var(--border); background: rgba(10,10,26,0.6);
+      backdrop-filter: blur(10px); transition: all 0.25s;
+      text-decoration: none; z-index: 200;
+    }
+    .back-link:hover { color: var(--text); border-color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: 1fr; }
+      .stats-row { gap: 24px; flex-wrap: wrap; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 580px) {
+      .products-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Portfolio</a>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="logo"><i class="fa-solid fa-store"></i> Seller<span>Space</span></div>
+      <div class="nav-links">
+        <a href="#products">Products</a>
+        <a href="#features">Features</a>
+        <a href="#cta">Pricing</a>
+        <a href="#cta" class="nav-cta">Start Selling</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge"><i class="fa-solid fa-rocket"></i> Launch Your Online Store Today</div>
+      <h1>Your Products, <br>Your <em>Marketplace</em></h1>
+      <p>SellerSpace is a modern e-commerce platform empowering independent sellers to list, manage, and sell products with a beautiful storefront.</p>
+      <div class="hero-btns">
+        <a href="#products" class="btn btn-primary"><i class="fa-solid fa-bag-shopping"></i> Browse Products</a>
+        <a href="#features" class="btn btn-outline"><i class="fa-solid fa-wand-magic-sparkles"></i> See Features</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num">1.2K+</div><div class="stat-label">Products</div></div>
+      <div class="stat"><div class="stat-num">350+</div><div class="stat-label">Sellers</div></div>
+      <div class="stat"><div class="stat-num">15K+</div><div class="stat-label">Customers</div></div>
+      <div class="stat"><div class="stat-num">4.8</div><div class="stat-label">Avg Rating</div></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section class="products-section" id="products">
+    <div class="container">
+      <h2 class="section-title">Trending Products</h2>
+      <p class="section-subtitle">Discover the most popular items from verified sellers worldwide.</p>
+
+      <div class="category-tabs">
+        <button class="cat-tab active" data-cat="all">All</button>
+        <button class="cat-tab" data-cat="electronics">Electronics</button>
+        <button class="cat-tab" data-cat="fashion">Fashion</button>
+        <button class="cat-tab" data-cat="home">Home & Living</button>
+      </div>
+
+      <div class="products-grid" id="productsGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <h2 class="section-title">Why SellerSpace?</h2>
+      <p class="section-subtitle">Everything you need to run a successful online store.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <i class="fa-solid fa-bolt"></i>
+          <h3>Instant Setup</h3>
+          <p>Launch your store in minutes with our guided setup wizard. No coding required.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fa-solid fa-shield-halved"></i>
+          <h3>Secure Payments</h3>
+          <p>Protected transactions with end-to-end encryption and buyer/seller protection.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fa-solid fa-chart-line"></i>
+          <h3>Analytics Dashboard</h3>
+          <p>Track sales, views, and engagement with real-time analytics and insights.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fa-solid fa-truck-fast"></i>
+          <h3>Easy Shipping</h3>
+          <p>Integrated shipping partners with label generation and tracking.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fa-solid fa-palette"></i>
+          <h3>Modern Storefront</h3>
+          <p>Beautiful, customizable templates to showcase your brand's unique identity.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fa-solid fa-headset"></i>
+          <h3>24/7 Support</h3>
+          <p>Get help anytime with our dedicated support team and community forums.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="cta">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Ready to Start Selling?</h2>
+        <p>Join thousands of sellers building their empire on SellerSpace. Free to start, scale as you grow.</p>
+        <a href="#" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Create Your Store</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p>SellerSpace — Built by <a href="../index.html">Yugh Singh Rana</a> · 2025</p>
+    </div>
+  </footer>
+
+  <script>
+    // Product data
+    const products = [
+      { name: "Wireless Earbuds Pro", seller: "TechNova", price: "₹2,499", rating: 4.7, cat: "electronics", icon: "fa-headphones", badge: "Bestseller" },
+      { name: "Minimalist Desk Lamp", seller: "HomeGlow", price: "₹1,199", rating: 4.5, cat: "home", icon: "fa-lightbulb", badge: "" },
+      { name: "Urban Backpack", seller: "StreetCraft", price: "₹1,899", rating: 4.8, cat: "fashion", icon: "fa-bag-shopping", badge: "New" },
+      { name: "Smart Watch X2", seller: "WearTech", price: "₹3,999", rating: 4.6, cat: "electronics", icon: "fa-clock", badge: "" },
+      { name: "Cotton Oversized Tee", seller: "FabWeave", price: "₹799", rating: 4.4, cat: "fashion", icon: "fa-shirt", badge: "Trending" },
+      { name: "Ceramic Plant Pot Set", seller: "GreenSpace", price: "₹649", rating: 4.9, cat: "home", icon: "fa-seedling", badge: "" },
+      { name: "Bluetooth Speaker", seller: "SoundWave", price: "₹1,699", rating: 4.3, cat: "electronics", icon: "fa-volume-high", badge: "" },
+      { name: "Canvas Sneakers", seller: "SoleKraft", price: "₹1,299", rating: 4.7, cat: "fashion", icon: "fa-shoe-prints", badge: "New" },
+    ];
+
+    const grid = document.getElementById("productsGrid");
+    const catTabs = document.querySelectorAll(".cat-tab");
+
+    function renderProducts(filter = "all") {
+      const filtered = filter === "all" ? products : products.filter(p => p.cat === filter);
+      grid.innerHTML = filtered.map(p => `
+        <div class="product-card">
+          <div class="product-img">
+            <i class="fa-solid ${p.icon}"></i>
+            ${p.badge ? `<span class="badge">${p.badge}</span>` : ""}
+          </div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-seller">by ${p.seller}</div>
+          <div class="product-price-row">
+            <span class="product-price">${p.price}</span>
+            <span class="product-rating">${"★".repeat(Math.floor(p.rating))}${"☆".repeat(5 - Math.floor(p.rating))} ${p.rating}</span>
+          </div>
+          <button class="product-cart-btn"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+        </div>
+      `).join("");
+    }
+
+    catTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        catTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        renderProducts(tab.dataset.cat);
+      });
+    });
+
+    renderProducts();
+
+    // Cart button interaction
+    document.addEventListener("click", e => {
+      if (e.target.closest(".product-cart-btn")) {
+        const btn = e.target.closest(".product-cart-btn");
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Added!';
+        btn.style.background = "linear-gradient(135deg, var(--accent3), #059669)";
+        btn.style.color = "#fff";
+        btn.style.borderColor = "transparent";
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+          btn.style = "";
+        }, 1500);
+      }
+    });
+  </script>
+</body>
+</html>
