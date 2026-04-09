@@ -816,6 +816,18 @@
         min-height: 150px;
       }
 
+      /* Fix for autofill suggestions making the background white */
+      .contact-form input:-webkit-autofill,
+      .contact-form input:-webkit-autofill:hover,
+      .contact-form input:-webkit-autofill:focus,
+      .contact-form textarea:-webkit-autofill,
+      .contact-form textarea:-webkit-autofill:hover,
+      .contact-form textarea:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--text) !important;
+        -webkit-box-shadow: 0 0 0px 1000px #111119 inset !important;
+        transition: background-color 5000s ease-in-out 0s;
+      }
+
       .form-status {
         font-size: 0.88rem;
         padding: 10px 14px;
